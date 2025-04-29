@@ -1,0 +1,28 @@
+#For embeddings
+unstructured
+pdfminer.six
+python-magic
+pi_heif
+unstructured-inference
+pdf2image
+pytesseract
+unstructured_pytesseract
+groq
+
+#For document retrieval
+pandas
+langchain
+lancedb
+rank_bm25
+pypdf
+nltk
+langchain_community
+PyPDF2
+neo4j
+langchain-huggingface
+langchain_groq
+langchain_google_genai
+
+#For API
+fastapi
+uvicorn

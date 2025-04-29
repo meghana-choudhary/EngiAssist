@@ -1,0 +1,670 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngiAssist - AI-Powered Engineering Study Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#001f3f',
+                        deepPurple: '#3a0ca3',
+                        accentPurple: '#7209b7',
+                        lightPurple: '#b5179e',
+                        darkBg: '#121212',
+                        darkCard: '#1e1e1e',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #001f3f 0%, #3a0ca3 50%, #b5179e 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #3a0ca3, #b5179e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .document-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-bubble {
+            border-radius: 1.25rem;
+            position: relative;
+        }
+        
+        .chat-bubble.user {
+            background-color: #3a0ca3;
+            color: white;
+        }
+        
+        .chat-bubble.assistant {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+        
+        .dark .chat-bubble.assistant {
+            background-color: #1e1e1e;
+            color: #f3f4f6;
+        }
+        
+        .toggle-checkbox:checked {
+            right: 0;
+            background-color: #3a0ca3;
+        }
+        
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #b5179e;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(58, 12, 163, 0.3);
+        }
+        
+        .dark .search-input {
+            background-color: #1e1e1e;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-darkBg dark:text-gray-100">
+    <!-- Header/Navigation -->
+    <header class="gradient-bg text-white shadow-lg">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-robot text-2xl"></i>
+                    <span class="text-xl font-bold">EngiAssist</span>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="#features" class="hover:text-gray-200 transition">Features</a>
+                    <a href="#how-it-works" class="hover:text-gray-200 transition">How It Works</a>
+                    <a href="#demo" class="hover:text-gray-200 transition">Demo</a>
+                    <a href="#contact" class="hover:text-gray-200 transition">Contact</a>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm">
+                            <i class="fas fa-sun"></i>
+                        </span>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none">
+                            <input type="checkbox" id="toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                            <label for="toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                        <span class="text-sm">
+                            <i class="fas fa-moon"></i>
+                        </span>
+                    </div>
+                    
+                    <button class="bg-accentPurple hover:bg-lightPurple px-4 py-2 rounded-full font-medium transition">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="container mx-auto px-6 py-16">
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                    Your AI-Powered <span class="gradient-text">Engineering Study Assistant</span>
+                </h1>
+                <p class="text-lg mb-8 text-gray-600 dark:text-gray-300">
+                    EngiAssist leverages Retrieval-Augmented Generation (RAG) to provide precise answers from verified college notes and textbooks. Get instant, accurate help for your engineering courses.
+                </p>
+                <div class="flex space-x-4">
+                    <button class="bg-accentPurple hover:bg-lightPurple text-white px-6 py-3 rounded-full font-medium transition">
+                        Try It Now <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                    <button class="border border-navy dark:border-gray-300 text-navy dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-darkCard px-6 py-3 rounded-full font-medium transition">
+                        Watch Demo <i class="fas fa-play-circle ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <div class="relative w-full max-w-md">
+                    <div class="absolute -top-6 -left-6 w-32 h-32 bg-purple-200 dark:bg-purple-900 rounded-full opacity-50 animate-pulse"></div>
+                    <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-blue-200 dark:bg-blue-900 rounded-full opacity-50 animate-pulse delay-300"></div>
+                    <div class="relative bg-white dark:bg-darkCard p-6 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center mb-4">
+                            <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="chat-bubble user p-4 max-w-xs ml-auto">
+                                <p>Explain the concept of Fourier Transform</p>
+                            </div>
+                            
+                            <div class="chat-bubble assistant p-4 max-w-xl">
+                                <p class="mb-2">The Fourier Transform decomposes a function into its constituent frequencies. Here's a relevant excerpt from your Signals & Systems notes:</p>
+                                <div class="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg mb-2">
+                                    <p class="text-sm italic">"The Fourier Transform of a continuous-time signal x(t) is given by X(ω) = ∫x(t)e^(-jωt)dt..."</p>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Source: EE201 Lecture Notes, Chapter 4</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex">
+                            <input type="text" placeholder="Ask your engineering question..." class="search-input flex-grow px-4 py-2 rounded-l-full border border-gray-300 dark:border-gray-600 focus:border-accentPurple">
+                            <button class="bg-accentPurple hover:bg-lightPurple text-white px-4 rounded-r-full">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="bg-gray-100 dark:bg-darkCard py-16">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Powerful Features for Engineering Students</h2>
+                <p class="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    EngiAssist combines AI with verified academic resources to give you the most accurate study help
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white dark:bg-darkBg p-6 rounded-xl shadow-md document-card">
+                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-database text-accentPurple text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Comprehensive Knowledge Base</h3>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Access thousands of verified engineering notes, textbooks, and past papers across all disciplines.
+                    </p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-white dark:bg-darkBg p-6 rounded-xl shadow-md document-card">
+                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-navy text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">RAG-Powered Answers</h3>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Get precise answers with references to relevant course materials using Retrieval-Augmented Generation.
+                    </p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-white dark:bg-darkBg p-6 rounded-xl shadow-md document-card">
+                    <div class="w-12 h-12 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-file-alt text-lightPurple text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Source Verification</h3>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Every answer comes with cited sources so you can verify the information and dive deeper.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">How EngiAssist Works</h2>
+                <p class="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    Our advanced RAG system ensures you get accurate, context-aware answers from trusted sources
+                </p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <img src="https://illustrations.popsy.co/amber/student-learning.svg" alt="Learning process" class="w-full max-w-md mx-auto">
+                </div>
+                <div class="md:w-1/2">
+                    <div class="space-y-8">
+                        <!-- Step 1 -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-navy text-white font-bold text-xl">
+                                    1
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Query Processing</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    Our system analyzes your question to understand the context and key concepts.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-deepPurple text-white font-bold text-xl">
+                                    2
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Document Retrieval</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    Relevant documents from our verified engineering knowledge base are retrieved.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-accentPurple text-white font-bold text-xl">
+                                    3
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Answer Generation</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    The AI generates a precise answer incorporating information from the retrieved documents.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-lightPurple text-white font-bold text-xl">
+                                    4
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Source Attribution</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    You receive the answer along with references to the source materials for verification.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="bg-gray-100 dark:bg-darkCard py-16">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">See It In Action</h2>
+                <p class="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    Try our interactive demo to experience how EngiAssist can help with your studies
+                </p>
+            </div>
+            
+            <div class="bg-white dark:bg-darkBg rounded-xl shadow-lg overflow-hidden max-w-4xl mx-auto">
+                <div class="flex border-b border-gray-200 dark:border-gray-700">
+                    <div class="w-1/3 p-4 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-darkCard">
+                        <h3 class="font-semibold mb-4">Sample Questions</h3>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                Explain the second law of thermodynamics
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                What's the difference between BJT and MOSFET?
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                Derive the Navier-Stokes equation
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                How does RSA encryption work?
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-2/3 p-4">
+                        <div class="h-96 overflow-y-auto mb-4 space-y-4" id="chat-container">
+                            <!-- Chat messages will appear here -->
+                            <div class="chat-bubble assistant p-4">
+                                <p>Hi there! I'm EngiAssist, your AI study assistant. Ask me anything about your engineering courses and I'll provide answers with references to relevant course materials.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <input type="text" placeholder="Ask your engineering question..." class="search-input flex-grow px-4 py-3 rounded-l-lg border border-gray-300 dark:border-gray-600 focus:border-accentPurple">
+                            <button class="bg-accentPurple hover:bg-lightPurple text-white px-6 rounded-r-lg">
+                                Send <i class="fas fa-paper-plane ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Trusted by Engineering Students</h2>
+                <p class="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    See what students from top engineering schools are saying about EngiAssist
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white dark:bg-darkBg p-6 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-accentPurple"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Sarah K.</h4>
+                            <p class="text-sm text-gray-500">Electrical Engineering, MIT</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        "EngiAssist saved me hours of searching through notes. The RAG system always finds the exact concept I need with proper references. It's like having a TA available 24/7!"
+                    </p>
+                    <div class="mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white dark:bg-darkBg p-6 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-navy"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Raj P.</h4>
+                            <p class="text-sm text-gray-500">Mechanical Engineering, Stanford</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        "The document retrieval feature is incredible. I can see exactly which lecture notes the answer came from, making it easy to verify and study further. Game changer for finals prep!"
+                    </p>
+                    <div class="mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-white dark:bg-darkBg p-6 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-pink-100 dark:bg-pink-900 flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-lightPurple"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Emily C.</h4>
+                            <p class="text-sm text-gray-500">Computer Science, ETH Zurich</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        "As an international student, sometimes concepts are hard to grasp from lectures alone. EngiAssist explains things clearly and shows me where to find more information. My grades have improved significantly!"
+                    </p>
+                    <div class="mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your Study Experience?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">
+                Join thousands of engineering students who are learning smarter with EngiAssist
+            </p>
+            <button class="bg-white text-navy hover:bg-gray-100 px-8 py-4 rounded-full font-bold text-lg shadow-lg transition">
+                Get Started for Free <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-navy text-gray-300 py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-robot text-2xl text-white"></i>
+                        <span class="text-xl font-bold text-white">EngiAssist</span>
+                    </div>
+                    <p class="mb-4">
+                        Your AI-powered engineering study assistant, delivering accurate answers with verified sources.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Features</a></li>
+                        <li><a href="#" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition">Demo</a></li>
+                        <li><a href="#" class="hover:text-white transition">Updates</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition">Tutorials</a></li>
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i> contact@engiassist.com
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2"></i> +1 (555) 123-4567
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i> San Francisco, CA
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p>© 2023 EngiAssist. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Dark mode toggle functionality
+        const toggle = document.getElementById('toggle');
+        const html = document.documentElement;
+        
+        // Check for saved user preference or use system preference
+        if (localStorage.getItem('darkMode') === 'true' || 
+            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            toggle.checked = true;
+        }
+        
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                html.classList.add('dark');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                html.classList.remove('dark');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+        
+        // Demo chat functionality
+        const demoQuestions = document.querySelectorAll('#demo button');
+        const chatContainer = document.getElementById('chat-container');
+        const demoInput = document.querySelector('#demo input');
+        const demoButton = document.querySelector('#demo button.bg-accentPurple');
+        
+        const responses = {
+            "Explain the second law of thermodynamics": {
+                answer: "The second law of thermodynamics states that the total entropy of an isolated system can never decrease over time. Here's a relevant excerpt from your Thermodynamics notes:",
+                source: "The entropy of any isolated system always increases. In a reversible process, the entropy remains constant, but all real processes are irreversible and result in an increase of entropy.",
+                reference: "ME202 Lecture Notes, Chapter 3"
+            },
+            "What's the difference between BJT and MOSFET": {
+                answer: "BJT (Bipolar Junction Transistor) and MOSFET (Metal-Oxide-Semiconductor Field-Effect Transistor) are both transistors but operate differently. From your Electronics textbook:",
+                source: "BJTs are current-controlled devices with three terminals (emitter, base, collector), while MOSFETs are voltage-controlled devices with four terminals (source, gate, drain, body). MOSFETs have higher input impedance and are more commonly used in digital circuits.",
+                reference: "EE205 Textbook, Section 4.3"
+            },
+            "Derive the Navier-Stokes equation": {
+                answer: "The Navier-Stokes equations describe the motion of viscous fluid substances. Here's the key derivation from your Fluid Mechanics notes:",
+                source: "Starting from Newton's second law applied to a fluid element, we consider normal and shear stresses. For an incompressible, Newtonian fluid, we get: ∂u/∂t + (u·∇)u = -∇p/ρ + ν∇²u + g where u is velocity, p is pressure, ρ is density, ν is kinematic viscosity, and g is gravity.",
+                reference: "ME301 Lecture Slides, Week 7"
+            },
+            "How does RSA encryption work": {
+                answer: "RSA is an asymmetric cryptographic algorithm based on the practical difficulty of factoring the product of two large prime numbers. From your Computer Security notes:",
+                source: "1. Choose two distinct primes p and q. 2. Compute n = pq and φ(n) = (p-1)(q-1). 3. Choose e such that 1 < e < φ(n) and gcd(e, φ(n)) = 1. 4. Determine d as e⁻¹ mod φ(n). Public key is (e, n), private key is (d, n). Encryption: c = mᵉ mod n. Decryption: m = cᵈ mod n.",
+                reference: "CS305 Course Materials, Chapter 6"
+            }
+        };
+        
+        function addMessage(role, content, source, reference) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-bubble ${role} p-4 max-w-xl ${role === 'user' ? 'ml-auto' : ''}`;
+            
+            let html = `<p>${content}</p>`;
+            if (source) {
+                html += `<div class="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg mt-2">
+                            <p class="text-sm italic">"${source}"</p>
+                        </div>`;
+            }
+            if (reference) {
+                html += `<p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Source: ${reference}</p>`;
+            }
+            
+            messageDiv.innerHTML = html;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        demoQuestions.forEach(button => {
+            button.addEventListener('click', function() {
+                const question = this.textContent.trim();
+                demoInput.value = question;
+                addMessage('user', question);
+                
+                // Simulate typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'chat-bubble assistant p-4 max-w-xs';
+                typingIndicator.innerHTML = '<div class="flex space-x-2"><div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div><div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-100"></div><div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-200"></div></div>';
+                chatContainer.appendChild(typingIndicator);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Remove typing indicator after delay and show response
+                setTimeout(() => {
+                    chatContainer.removeChild(typingIndicator);
+                    const response = responses[question];
+                    addMessage('assistant', response.answer, response.source, response.reference);
+                }, 1500);
+            });
+        });
+        
+        demoButton.addEventListener('click', function() {
+            const question = demoInput.value.trim();
+            if (question) {
+                addMessage('user', question);
+                demoInput.value = '';
+                
+                // Simulate typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'chat-bubble assistant p-4 max-w-xs';
+                typingIndicator.innerHTML = '<div class="flex space-x-2"><div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div><div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-100"></div><div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-200"></div></div>';
+                chatContainer.appendChild(typingIndicator);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Remove typing indicator after delay and show response
+                setTimeout(() => {
+                    chatContainer.removeChild(typingIndicator);
+                    
+                    // Check if we have a predefined response
+                    let found = false;
+                    for (const q in responses) {
+                        if (question.toLowerCase().includes(q.toLowerCase().split(' ')[0])) {
+                            const response = responses[q];
+                            addMessage('assistant', response.answer, response.source, response.reference);
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        addMessage('assistant', "I'm sorry, I couldn't find a specific answer to that question in our knowledge base. Could you try rephrasing or asking about a more specific engineering concept?");
+                    }
+                }, 1500);
+            }
+        });
+        
+        demoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                demoButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
+

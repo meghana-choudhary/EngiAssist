@@ -1,0 +1,12 @@
+docs/
+.env
+.vscode/
+/**/__pycache__/
+*.pdf
+data/
+embeddings/
+/Backend/data/
+
+
+
+
