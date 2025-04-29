@@ -32,7 +32,7 @@ def create_retriever():
     # Creating BM25 Retriever 
 
     #Loading and rebuilding retriever 
-    with open("bm25_docs.pkl", "rb") as f:
+    with open("../data/bm25_docs.pkl", "rb") as f:
         loaded_docs = pickle.load(f)
 
     bm25_retriever = BM25Retriever.from_documents(loaded_docs, k=10)

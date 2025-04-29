@@ -4,7 +4,7 @@ from sentence_transformers import CrossEncoder
 from langchain.chains import LLMChain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.retrievers import WikipediaRetriever
-from Backend.app.Retrieving import create_retriever
+from Retrieving import create_retriever
 import re
 import json
 from typing import Dict, Any, Optional
@@ -13,13 +13,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+ranking_model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+ensemble_retriever = create_retriever()
 
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')
-api_key = os.getenv('GOOGLE_API_KEY')
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+api_key = os.getenv("GOOGLE_API_KEY")
 
 
-#--------------------Nested Query------------------------------
+# --------------------Nested Query------------------------------
 
 
 def extract_json_object(text: str) -> Optional[Dict[str, Any]]:
@@ -29,7 +30,7 @@ def extract_json_object(text: str) -> Optional[Dict[str, Any]]:
     # Regex to find a JSON object starting with { and ending with }
     # Uses re.DOTALL to allow '.' to match newline characters.
     # This assumes the JSON object is the main content between the first { and last }
-    match = re.search(r'\{.*\}', text, re.DOTALL)
+    match = re.search(r"\{.*\}", text, re.DOTALL)
 
     if match:
         potential_json = match.group(0)
@@ -40,8 +41,10 @@ def extract_json_object(text: str) -> Optional[Dict[str, Any]]:
             if isinstance(parsed_json, dict):
                 return parsed_json
             else:
-                 print(f"Warning: Extracted JSON is not an object (dict): {type(parsed_json)}")
-                 return None # Or handle arrays/other types if needed
+                print(
+                    f"Warning: Extracted JSON is not an object (dict): {type(parsed_json)}"
+                )
+                return None  # Or handle arrays/other types if needed
         except json.JSONDecodeError:
             # Handle cases where the extracted text is not valid JSON
             print(f"Error: Failed to decode JSON from extracted text: {potential_json}")
@@ -51,6 +54,7 @@ def extract_json_object(text: str) -> Optional[Dict[str, Any]]:
         print("No JSON object pattern found in the text.")
         return None
 
+
 def get_aggregated_query(queries: str, current_question: str):
     """
     Get the restructured query from the previous queries and current question.
@@ -59,50 +63,57 @@ def get_aggregated_query(queries: str, current_question: str):
         template="""
         You are given a list of previously asked questions and a recently asked question. Your task is to analyze and combine all questions into a single, concise, and coherent question that captures the full intent and context provided across them.
 
-The final question should preserve the core meaning of each input question.
+        The final question should preserve the core meaning of each input question.
 
-Use pronoun resolution to replace ambiguous references like "this", "that" or "it" with the correct noun.
+        Use pronoun resolution to replace ambiguous references like "this", "that" or "it" with the correct noun.
 
-Assume all questions are about the same underlying subject unless otherwise stated.
+        Assume all questions are about the same underlying subject unless otherwise stated.
 
-Return the aggregated question in a JSON format with the key "aggregated_question".
+        Return the aggregated question in a JSON format with the key "aggregated_question". Do not give extra information.
 
-If the the recently asked question is of different subject then, return the recently asked question as it is in the "aggregated_question".
+        If the the recently asked question is of different subject then, return the recently asked question as it is in the "aggregated_question".
 
-Example Inputs:
+        Please follow instructions and give response in exact format without extra commentry.
+        Format:
 
-**Previously Asked Questions**
-1. What is B2B model?
+        {{
+            "aggregated_question": "The aggregated question"
+        }}
 
-**Recently Asked Question**
-How is it different from B2C Model?
+        Example Inputs:
 
-**Output**:
-{{
-    "aggregated_question": "What are the differences between B2B and B2C models?"
-}}
+        **Previously Asked Questions**
+        1. What is B2B model?
 
-**Previously Asked Questions**
-1. What is statistical analysis?
-2. Give it for a 5 marks answer.
+        **Recently Asked Question**
+        How is it different from B2C Model?
 
-**Recently Asked Question**
-Explain second step in detail
+        **Output**:
+        {{
+            "aggregated_question": "What are the differences between B2B and B2C models?"
+        }}
 
-**Output**:
-{{
-    "aggregated_question": "Give explanation of second step in statistical analysis for a 5 marks answer."
-}}
+        **Previously Asked Questions**
+        1. What is statistical analysis?
+        2. Give it for a 5 marks answer.
 
-**Previously Asked Questions**
-{previous_questions}
+        **Recently Asked Question**
+        Explain second step in detail
 
-**Recently Asked Question**
-{current_question}
+        **Output**:
+        {{
+            "aggregated_question": "Give explanation of second step in statistical analysis for a 5 marks answer."
+        }}
 
-**Final Answer**
-""",
-        input_variables=["previous_questions", "current_question"]
+        **Previously Asked Questions**
+        {previous_questions}
+
+        **Recently Asked Question**
+        {current_question}
+
+        **Final Answer**
+        """,
+        input_variables=["previous_questions", "current_question"],
     )
     llm = ChatGroq(
         model="llama-3.3-70b-versatile", temperature=0.2, groq_api_key=GROQ_API_KEY
@@ -114,25 +125,29 @@ Explain second step in detail
     )
 
     json_data = extract_json_object(response.content)
+    print(json_data)
 
     if json_data and "aggregated_question" in json_data:
         return json_data["aggregated_question"]
     else:
         # Fallback or error handling if JSON extraction fails
-        print(f"Warning: Could not extract aggregated question from LLM response: {response.content}")
+        print(
+            f"Warning: Could not extract aggregated question from LLM response: {response.content}"
+        )
         # Fallback to using the current question directly or raise an error
         return current_question
-    
-#--------------------- Ensemble Retriever and Cross Encoder -------------------------
+
+
+# --------------------- Ensemble Retriever and Cross Encoder -------------------------
 
 
 def get_required_context(agg_query):
-    ensemble_retriever = create_retriever()
+   
 
     results = ensemble_retriever.get_relevant_documents(agg_query)
     rerank_pairs = [(agg_query, doc.page_content) for doc in results]
 
-    scores = model.predict(rerank_pairs)
+    scores = ranking_model.predict(rerank_pairs)
 
     # print(scores)
 
@@ -141,28 +156,28 @@ def get_required_context(agg_query):
 
     top_10_contents = [doc.page_content for _, doc in ranked_results[:10]]
     # print(top_10_contents)
-   
 
-    contents=[]
+    contents = []
     for i in top_10_contents:
         if "Chunk_Text:" in i:
-            j=i[12:].lstrip()
+            j = i[12:].lstrip()
             contents.append(j)
         else:
             contents.append(i)
 
     # for i in top_10_contents:
     #     print(i)
-   
+
     # for i in contents:
     #     print(i)
-   
+
     # print(len(contents))
     # print(len(top_10_contents))
 
     joined_content = "\n\n".join(contents)
     # print(joined_content)
     return joined_content
+
 
 def get_llm_response(context, query, history):
     prompt = PromptTemplate(
@@ -180,20 +195,24 @@ def get_llm_response(context, query, history):
         {chat_history}
 
         Based on the retrieved information, provide a comprehensive, refined, and insightful response to the user's query.
-        """
-
+        """,
     )
 
     # Load the LLM (customize as needed)
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-preview-04-17", temperature=0.2, api_key=api_key)
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash-preview-04-17", temperature=0.2, api_key=api_key
+    )
 
     # Create chain and run
     chain = LLMChain(llm=llm, prompt=prompt)
-    response = chain.run({"query": query, "retrieved_text": context, "chat_history": history})
+    response = chain.run(
+        {"query": query, "retrieved_text": context, "chat_history": history}
+    )
     # print(response)
     return response
 
-#----------------For Wiki Search---------------------
+
+# ----------------For Wiki Search---------------------
 def get_wikipedia_context(query):
     """
     Get relevant context from Wikipedia.
@@ -207,26 +226,14 @@ def get_wikipedia_context(query):
     return wiki
 
 
-
 if __name__ == "__main__":
+    history = " "
     queries = """1. What is B2B model?
     2. What is B2C model"""
 
     query = "How do both differ from each other"
     agg_query = get_aggregated_query(queries, query)
     context = get_required_context(agg_query)
-    response = get_llm_response(context, agg_query)
+    response = get_llm_response(context, agg_query, history)
 
     print(response)
-
-
-
-
-
-
-
-
-
-
-
-

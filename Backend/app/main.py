@@ -4,13 +4,13 @@ import uvicorn
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
-from Backend.app.Utils import get_wikipedia_context, get_aggregated_query, get_required_context, get_llm_response
+# from Utils import get_wikipedia_context, get_aggregated_query, get_required_context, get_llm_response
+from Utils import *
 
 
 load_dotenv()
 
 PORT = os.getenv("PORT")
-# OPIK_TRACK = os.getenv("OPIK_TRACK")
 
 app = FastAPI()
 
@@ -38,8 +38,10 @@ class ChatRequest(BaseModel):
 async def search(request: ChatRequest):
     chunks = []
     similar = {"similar_docs":[]}
+    agg_query=" "
     query = request.query.lower()
-    queries = request.query.lower()
+    queries = request.queries.lower()
+    
     if request.search_web:
         chunks = get_wikipedia_context(query)
 
@@ -52,8 +54,6 @@ async def search(request: ChatRequest):
         chunks, agg_query, request.history
     )
     similar["summary"] = response
-    # if OPIK_TRACK == "True":
-    #     log_metrics(request.query, response, chunks)
     return similar
 
 
