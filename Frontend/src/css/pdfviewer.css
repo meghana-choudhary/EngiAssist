@@ -1,0 +1,33 @@
+.pdf-section{
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    margin: 20px;
+}
+
+.file-btn{
+    border: 1px solid #0056b3;
+    background-color: white;
+    border-radius: 5px;
+    margin: 0px 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.file-btn:hover{
+    background-color: #0056b3;
+    color: white;
+}
+
+#rel-heading{
+    font-size: 25px;
+    font-family: "Poppins", serif;
+    color: #0056b3;
+
+}
+
+iframe{
+    width: 100%;
+    height: 70vh;
+}
+
