@@ -2,7 +2,7 @@ import Chat from "./Chat";
 import "../css/hero.css";
 import "../css/pdfviewer.css";
 import { useState } from "react";
-import logo from "../assets/engi.jpg";
+import logo from "../assets/engiassist-Photoroom.png";
 
 interface Relevant_Files {
   files: { [key: string]: any }[];

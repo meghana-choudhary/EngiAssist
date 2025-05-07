@@ -3,6 +3,7 @@
 body {
     margin: 0px;
     padding: 0px;
+    background-color: #F0E7F8;
 }
 
 .chat-container {
@@ -231,6 +232,7 @@ input {
     height: 10vh;
     margin: 3px 7px;
     font-family: "Poppins", serif;
+    
     
 }
 
