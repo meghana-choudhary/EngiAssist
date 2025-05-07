@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import { performSearch } from "../util/Util.ts";
+import "../css/style.css";
 
 interface Message {
   text: string;
@@ -14,15 +15,13 @@ interface Props {
 // Move constants outside the component
 const GENRE_OPTIONS = [
   { label: "All", value: "All" },
-  { label: "Finance", value: "Finance" },
-  { label: "Economics", value: "Economics" },
-  { label: "Lab Manual", value: "Lab Manual" },
-  { label: "Architecture", value: "Architecture" },
-  { label: "Mechanical", value: "Mechanical" },
-  { label: "IOT", value: "IOT" },
-  { label: "Comic", value: "Comic" },
-  { label: "Story", value: "Story" },
-  { label: "Poem", value: "Poem" },
+  { label: "E-Commerce", value: "E-Commerce" },
+  { label: "Web and Internet Technology", value: "WebTech" },
+  { label: "Business Analytics", value: "BusinessAnalytics" },
+  {
+    label: "Professional Ethics and Project Management",
+    value: "ProfessionalEthics",
+  },
 ];
 
 const MODEL_OPTIONS = [
@@ -37,22 +36,22 @@ const DEFAULT_MODEL = MODEL_OPTIONS[0].value;
 const Chat = ({ returnOptions }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null); // Use null for no selection
+  // const [selectedGenre, setSelectedGenre] = useState<string | null>(null); // Use null for no selection
   const [model, setModel] = useState(DEFAULT_MODEL);
   const [sendPressed, setSendPressed] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [apiKey, setApiKey] = useState(""); // Default to empty string
   const [searchWeb, setSearchWeb] = useState(false); // Use boolean
   const [isSending, setIsSending] = useState(false); // Add loading state
+  const [genre, setGenre] = useState("");
+  const [genreSelected, setGenreSelected] = useState(false);
 
-  const genreSelected = selectedGenre !== null; // Derived state
-
-  const handleGenreClick = useCallback((genreValue: string) => {
-    setSelectedGenre(genreValue);
-  }, []);
+  // const handleGenreClick = useCallback((genreValue: string) => {
+  //   setSelectedGenre(genreValue);
+  // }, []);
 
   const sendMessage = useCallback(async () => {
-    if (!input.trim() || !selectedGenre || isSending) return;
+    if (!input.trim() || !genreSelected || isSending) return;
 
     setSendPressed(true);
     setIsSending(true); // Set loading state
@@ -71,7 +70,7 @@ const Chat = ({ returnOptions }: Props) => {
     try {
       const response = await performSearch(
         input,
-        selectedGenre,
+        genre,
         historyMessages,
         model,
         model === DEFAULT_MODEL ? "API_KEY" : apiKey, // Use default key only for default model
@@ -92,7 +91,7 @@ const Chat = ({ returnOptions }: Props) => {
     }
   }, [
     input,
-    selectedGenre,
+    genreSelected,
     isSending,
     messages,
     model,
@@ -144,7 +143,9 @@ const Chat = ({ returnOptions }: Props) => {
     if (isSending) {
       renderedMessages.push(
         <div key="typing" className="message bot typing-indicator">
-          <span>.</span><span>.</span><span>.</span> {/* Simple dot animation */}
+          <span>.</span>
+          <span>.</span>
+          <span>.</span> {/* Simple dot animation */}
         </div>
       );
     }
@@ -217,17 +218,26 @@ const Chat = ({ returnOptions }: Props) => {
                 )}
               </div>
               <h1>How can I help you?</h1>
-              <p>Please select the Document type</p>
+              <p>Select the topic you want to discuss</p>
             </div>
             {/* Genre Selector */}
-            <div>
-              {GENRE_OPTIONS.map((item) => (
+            <div className="genre-select">
+              {GENRE_OPTIONS.map((item, index) => (
                 <button
-                  className={`genre-opt ${
-                    selectedGenre === item.value ? "active-btn" : ""
-                  }`}
-                  key={item.value} // Use value as key
-                  onClick={() => handleGenreClick(item.value)}
+                  className="genre-opt"
+                  id={"opt" + index}
+                  key={index}
+                  onClick={() => {
+                    setGenre(item.value);
+                    setGenreSelected(true);
+                    GENRE_OPTIONS.forEach((_, idx) => {
+                      let e = document.getElementById("opt" + idx);
+                      e?.classList.remove("active-btn");
+                    });
+                    let x = document.getElementById("opt" + index);
+                    x?.classList.add("active-btn"); 
+                    console.log(x);
+                  }}
                 >
                   {item.label}
                 </button>

@@ -36,7 +36,7 @@ body {
 .user {
     border-radius: 15px 15px 0px 15px;
     align-self: flex-end;
-    background-color: #007bff;
+    background-color: #8F87F1;
     color: white;
 }
 
@@ -65,7 +65,7 @@ input {
 
 #send-btn {
     padding: 15px;
-    background-color: #007bff;
+    background-color: #8F87F1;
     color: white;
     border: none;
     cursor: pointer;
@@ -75,8 +75,7 @@ input {
 
 #wiki-btn {
     padding: 15px;
-    color: black;
-    border: 2px solid greenyellow;
+    border: 1px solid #8F87F1;
     cursor: pointer;
     border-radius: 15px;
     font-family: "Poppins", serif;
@@ -84,11 +83,12 @@ input {
 }
 
 #send-btn:hover {
-    background-color: #0056b3;
+    background-color: #7f74f0;
 }
 
 #wiki-btn:hover {
-    background-color: greenyellow;
+    background-color: #8F87F1;
+    color: white;
 }
 
 .wiki-search {
@@ -96,7 +96,8 @@ input {
 }
 
 .search-web-active {
-    background-color: greenyellow;
+    background-color: #8F87F1;
+    color: white;
 }
 
 .chat-welcome {
@@ -117,27 +118,6 @@ input {
     font-family: "Poppins", serif;
 }
 
-.genre-opt {
-    border: 1px solid #0056b3;
-    background-color: white;
-    color: #0056b3;
-    border-radius: 10px;
-    padding: 10px;
-    width: 8vw;
-    margin: 3px 7px;
-    flex-wrap: nowrap;
-    font-family: "Poppins", serif;
-}
-
-.genre-opt:hover {
-    background-color: #0056b3;
-    color: white;
-}
-
-.active-btn {
-    background-color: #0056b3;
-    color: white;
-}
 
 #model {
     padding: 10px;
@@ -233,4 +213,33 @@ input {
 .message.typing-indicator {
     padding: 10px 15px;
     font-size: larger;
+}
+
+.genre-select {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.genre-opt {
+    border: 1px solid #8F87F1;
+    background-color: white;
+    color: #0056b3;
+    border-radius: 10px;
+    padding: 5px;
+    width: 15vw;
+    height: 10vh;
+    margin: 3px 7px;
+    font-family: "Poppins", serif;
+    
+}
+
+.genre-opt:hover {
+    background-color: #8F87F1;
+    color: white;
+}
+
+.active-btn {
+    background-color: #8F87F1;
+    color: white;
 }
