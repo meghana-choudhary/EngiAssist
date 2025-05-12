@@ -10,10 +10,8 @@ interface ChatApiResponse {
 // Define an interface for the request payload
 interface ChatApiPayload {
   query: string;
+  queries: string;
   history: string;
-  genre: string;
-  model: string;
-  api_key: string;
   search_web: boolean;
 }
 
@@ -31,28 +29,22 @@ if (!API_BASE_URL) {
 /**
  * Performs a search request to the chat API.
  * @param query - The user's search query.
- * @param genre - The selected document genre.
+ * @param queries- Past queries
  * @param history - The recent chat history.
- * @param model - The selected AI model.
- * @param api_key - The API key for the selected model (if required).
  * @param search_web - Flag indicating whether to search the web.
  * @returns A promise that resolves with the API response.
  * @throws An error if the API request fails.
  */
 export async function performSearch(
   query: string,
-  genre: string,
+  queries: string,
   history: string,
-  model: string,
-  api_key: string,
   search_web: boolean
 ): Promise<ChatApiResponse> {
   const payload: ChatApiPayload = {
     query,
+    queries,
     history,
-    genre,
-    model,
-    api_key,
     search_web,
   };
 
